@@ -8,6 +8,7 @@ data class Fingerprint(
     val path: String,
     val md5: String,
     val sha256: String,
+    val sha512: String,
     val sha1: String,
     val size: Int
 )
