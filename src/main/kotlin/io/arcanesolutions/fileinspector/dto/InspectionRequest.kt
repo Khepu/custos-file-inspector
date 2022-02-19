@@ -1,4 +1,4 @@
-package io.arcanesolutions.fileinspector.model
+package io.arcanesolutions.fileinspector.dto
 
 import kotlinx.serialization.Serializable
 
