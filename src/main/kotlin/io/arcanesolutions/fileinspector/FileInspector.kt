@@ -76,15 +76,14 @@ fun inspector(
 
 fun fingerprintFile(path: Path): Flux<Fingerprint> =
     ByteBufFlux.fromPath(path)
+        .subscribeOn(boundedElastic())
         .publishOn(parallel())
         .doOnNext { log.info("Processing file '{}'.", path.absolute()) }
         .flatMap {
             if (!isExecutable(it)) {
-                Mono.error(
-                    WrongFormatException(path.absolute().toString()))
+                Mono.error(WrongFormatException(path.absolute().toString()))
             } else if (!isWithinBounds(it)) {
-                Mono.error(
-                    FileTooLargeException(path.absolute().toString()))
+                Mono.error(FileTooLargeException(path.absolute().toString()))
             } else {
                 Mono.just(it)
             }
@@ -104,8 +103,7 @@ fun fingerprintFile(path: Path): Flux<Fingerprint> =
                 sha1(bytes),
                 size)
         }
-        .doOnNext{ log.info("File '{}' has been processed successfully.", path.absolute())}
-        .subscribeOn(boundedElastic())
+        .doOnNext { log.info("File '{}' has been processed successfully.", path.absolute()) }
 
 /**
  * A file is considered an executable if the first two bytes are 'MZ'.
