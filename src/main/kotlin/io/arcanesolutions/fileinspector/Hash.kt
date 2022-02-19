@@ -19,5 +19,8 @@ fun md5(bytes: ByteArray) =
 fun sha256(bytes: ByteArray) =
     hash(bytes, "SHA256")
 
+fun sha512(bytes: ByteArray) =
+    hash(bytes, "SHA512")
+
 fun sha1(bytes: ByteArray) =
     hash(bytes, "SHA1")
