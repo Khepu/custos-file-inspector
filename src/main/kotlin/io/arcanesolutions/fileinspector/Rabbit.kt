@@ -55,3 +55,49 @@ fun toMessage(message: String, rabbitOutput: RabbitOutput): Mono<OutboundMessage
             rabbitOutput.routingKey,
             basicProperties,
             message.toByteArray(UTF_8)))
+
+fun declareDeadLetterQueue(deadLetterQueueName: String, sender: Sender): Mono<AMQP.Queue.DeclareOk> =
+    sender.declareQueue(
+        QueueSpecification()
+            .name(deadLetterQueueName)
+            .durable(true)
+            .autoDelete(false))
+
+fun declareQueue(queueName: String, deadLetterExchange: String, sender: Sender): Mono<AMQP.Queue.DeclareOk> =
+    sender.declareQueue(
+        QueueSpecification()
+            .name(queueName)
+            .durable(true)
+            .autoDelete(false)
+            .arguments(
+                mapOf<String, String>(
+                    Pair("x-dead-letter-exchange", deadLetterExchange))))
+
+fun declareExchange(exchangeName: String, sender: Sender): Mono<AMQP.Exchange.DeclareOk> =
+    sender.declareExchange(
+        ExchangeSpecification()
+            .name(exchangeName)
+            .type("topic")
+            .durable(true)
+            .autoDelete(false))
+
+fun bindConsumer(rabbitInput: RabbitInput, sender: Sender): Mono<AMQP.Queue.BindOk> {
+    val deadLetterExchange = "DLX"
+    val deadLetterQueueName = rabbitInput.queue + ".dlq"
+
+    return declareQueue(rabbitInput.queue, deadLetterExchange, sender)
+        .then(declareDeadLetterQueue(deadLetterQueueName, sender))
+        .then(declareExchange(rabbitInput.exchange, sender))
+        .then(
+            sender.bind(
+                BindingSpecification()
+                    .exchange(rabbitInput.exchange)
+                    .queue(rabbitInput.queue)
+                    .routingKey(rabbitInput.routingKey)))
+        .then(
+            sender.bind(
+                BindingSpecification()
+                    .exchange(deadLetterExchange)
+                    .queue(deadLetterQueueName)
+                    .routingKey(rabbitInput.queue)))
+}
