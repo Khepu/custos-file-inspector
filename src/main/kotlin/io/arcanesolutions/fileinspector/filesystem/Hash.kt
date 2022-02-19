@@ -1,4 +1,4 @@
-package io.arcanesolutions.fileinspector
+package io.arcanesolutions.fileinspector.filesystem
 
 import java.nio.charset.StandardCharsets.UTF_8
 import java.security.MessageDigest
