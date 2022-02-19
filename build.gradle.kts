@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val kotlinVersion = "1.6.10"
+val hopliteVersion = "1.4.16"
 
 plugins {
     kotlin("jvm") version "1.6.10"
@@ -27,9 +28,13 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.6.0")
 
+    //config
+    implementation("com.sksamuel.hoplite:hoplite-core:$hopliteVersion")
+    implementation("com.sksamuel.hoplite:hoplite-json:$hopliteVersion")
+
     // logging
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
-    implementation("ch.qos.logback:logback-classic:1.2.6")
+    implementation("ch.qos.logback:logback-classic:1.2.10")
 
     // testing
     testImplementation("io.projectreactor:reactor-test:3.4.14")
