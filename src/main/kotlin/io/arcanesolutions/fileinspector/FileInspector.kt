@@ -9,6 +9,7 @@ import io.arcanesolutions.fileinspector.filesystem.sha1
 import io.arcanesolutions.fileinspector.filesystem.sha256
 import io.arcanesolutions.fileinspector.filesystem.sha512
 import io.arcanesolutions.fileinspector.model.FileTooLargeException
+import io.arcanesolutions.fileinspector.model.FileType
 import io.arcanesolutions.fileinspector.model.Fingerprint
 import io.arcanesolutions.fileinspector.model.WrongFormatException
 import io.netty.buffer.ByteBuf
@@ -97,6 +98,7 @@ fun fingerprintFile(path: Path): Flux<Fingerprint> =
             Fingerprint(
                 path.name,
                 path.absolute().toString(),
+                FileType.WINDOWS_PORTABLE_EXECUTABLE,
                 md5(bytes),
                 sha256(bytes),
                 sha512(bytes),
@@ -106,13 +108,11 @@ fun fingerprintFile(path: Path): Flux<Fingerprint> =
         .doOnNext { log.info("File '{}' has been processed successfully.", path.absolute()) }
 
 /**
- * A file is considered an executable if the first two bytes are 'MZ'.
+ * A file is considered an executable if the first two bytes are 'MZ' (0x4D5A).
+ * This includes .exe and .dll files.
  */
-fun isExecutable(byteBuffer: ByteBuf): Boolean {
-    val mz: Short = 0x4D5A
-
-    return byteBuffer.getShort(0) == mz
-}
+fun isExecutable(byteBuffer: ByteBuf) =
+    byteBuffer.getShort(0) == 0x4D5A.toShort()
 
 fun isWithinBounds(byteBuffer: ByteBuf) =
     byteBuffer.readableBytes() <= config.maxFileSize

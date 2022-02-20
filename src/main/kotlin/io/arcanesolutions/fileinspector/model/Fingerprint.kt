@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 data class Fingerprint(
     val name: String,
     val path: String,
+    val fileType: FileType,
     val md5: String,
     val sha256: String,
     val sha512: String,
