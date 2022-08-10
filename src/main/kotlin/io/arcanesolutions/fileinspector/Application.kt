@@ -6,13 +6,13 @@ import com.sksamuel.hoplite.fp.getOrElse
 import io.arcanesolutions.fileinspector.config.Configuration
 import mu.KotlinLogging
 
-val config = ConfigLoader.Builder()
+val config = ConfigLoader.builder()
     .addSource(PropertySource.resource("/config.json"))
     .build()
     .loadConfig<Configuration>()
     .getOrElse { throw Exception("Could not find configuration file!") }
 
-fun main(args: Array<String>) {
+fun main() {
     val log = KotlinLogging.logger("application")
     val rabbitConnection = rabbitConnection(config.rabbitConnection)
 
